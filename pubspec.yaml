@@ -44,6 +44,7 @@ dependencies:
   cached_network_image: ^3.3.1
   dio: ^5.4.3+1
   delightful_toast: ^1.1.0
+  html: ^0.15.4
 
 dev_dependencies:
   flutter_test:
