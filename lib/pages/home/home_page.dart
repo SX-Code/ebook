@@ -1,9 +1,11 @@
 import 'package:e_book_demo/model/activity.dart';
 import 'package:e_book_demo/model/book.dart';
-import 'package:e_book_demo/pages/components/my_book_tile.dart';
+import 'package:e_book_demo/pages/components/book_tile/my_book_tile.dart';
 import 'package:e_book_demo/pages/components/my_search_tile.dart';
 import 'package:e_book_demo/pages/home/components/my_book_activities.dart';
+import 'package:e_book_demo/pages/home/components/my_book_activities_skeleton.dart';
 import 'package:e_book_demo/pages/home/components/my_book_activity_labels.dart';
+import 'package:e_book_demo/pages/home/components/my_book_activity_labels_skeleton.dart';
 import 'package:e_book_demo/pages/home/home_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, List<Activity>? activities, child) {
                       if (activities == null) {
                         // 这里可以展示骨架屏
-                        return const SizedBox();
+                        return const MyBookActivitiesSkeleton();
                       }
                       return MyBookActivities(activities: activities);
                     },
@@ -89,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, labels, child) {
                     if (labels == null) {
                       // 骨架屏
-                      return const SizedBox();
+                      return const MyBookActivityLabelsSkeleton();
                     }
                     return MyBookActivityLabels(
                       labels: labels,
@@ -107,10 +109,6 @@ class _HomePageState extends State<HomePage> {
                 // 特别为您准备
                 Selector<HomeViewModel, List<Book>?>(
                   builder: (context, books, child) {
-                    if (books == null) {
-                      // 骨架屏
-                      return const SizedBox();
-                    }
                     return MyBookTile(
                       books: books,
                       width: 120.w,

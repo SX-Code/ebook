@@ -10,7 +10,8 @@ class MyBookActivities extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return // 读书活动
+    // 读书活动
+    return 
         Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
