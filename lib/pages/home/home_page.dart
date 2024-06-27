@@ -17,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   final HomeViewModel _viewModel = HomeViewModel();
   @override
   void initState() {
@@ -92,7 +91,13 @@ class _HomePageState extends State<HomePage> {
                       // 骨架屏
                       return const SizedBox();
                     }
-                    return MyBookActivityLabels(labels: labels);
+                    return MyBookActivityLabels(
+                      labels: labels,
+                      itemTap: (index) {
+                        int? kind = index == 0 ? null : index - 1;
+                        _viewModel.getBookActivities(kind);
+                      },
+                    );
                   },
                   selector: (_, viewModel) => viewModel.activityLabels,
                 ),

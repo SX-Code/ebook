@@ -11,7 +11,6 @@ class MyBookActivityLabels extends StatefulWidget {
 }
 
 class _MyBookActivityLabelsState extends State<MyBookActivityLabels> {
-
   int _value = 0;
 
   @override
@@ -37,13 +36,12 @@ class _MyBookActivityLabelsState extends State<MyBookActivityLabels> {
                   label: Text(widget.labels[index]),
                   selected: _value == index,
                   onSelected: (value) {
+                    // 防止重复点击
+                    if (_value == index) return;
                     setState(() {
                       _value = index;
                     });
-                    if(_value != index) {
-                      // 防止重复点击
-                      widget.itemTap?.call(index);
-                    }
+                    widget.itemTap?.call(index);
                   },
                 ),
               );

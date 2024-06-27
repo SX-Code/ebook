@@ -1,5 +1,6 @@
 class ApiString {
 
+  static const String bookActivitiesJsonUrl = "https://book.douban.com/j/home/activities";
   static const String bookDoubanHomeUrl = "https://book.douban.com";
   static const String bookActivityCoverReg = r"https:.*(?='\))"; // 获取背景图片
   static const String bookIdRegExp = r'(?<=/subject/)\d+(?=/)'; // 获取书籍ID

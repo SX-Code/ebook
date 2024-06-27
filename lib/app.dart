@@ -1,3 +1,4 @@
+import 'package:e_book_demo/http/dio_instance.dart';
 import 'package:e_book_demo/pages/root/root_page.dart';
 import 'package:e_book_demo/pages/theme/dart_theme.dart';
 import 'package:e_book_demo/pages/theme/theme_provider.dart';
@@ -19,9 +20,20 @@ Size get designSize {
       logicalShortestSize * scaleFactor, logicalLongestSize * scaleFactor);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    DioInstance.instance().initDio();
+  }
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
