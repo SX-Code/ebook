@@ -5,6 +5,7 @@ import 'package:e_book_demo/http/dio_instance.dart';
 import 'package:e_book_demo/http/spider/api_string.dart';
 import 'package:e_book_demo/model/activity.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/model/types.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
@@ -17,13 +18,42 @@ class SpiderApi {
     return _instance ??= SpiderApi._();
   }
 
+  /// 解析豆瓣商城首页数据
+  Future fetchDoubanStoreData({
+    Function(List<Book> values)? weeklyBooksCallback,
+    Function(List<Book> values)? top250Callback,
+  }) async {
+    String html = await DioInstance.instance()
+        .getString(path: ApiString.bookDoubanHomeUrl);
+    Document doc = parse(html);
+
+    if (weeklyBooksCallback != null) {
+      weeklyBooksCallback.call(_parseWeeklyBooks(doc));
+    }
+
+    if (top250Callback != null) {
+      top250Callback.call(_parseTop250Books(doc));
+    }
+  }
+
+  /// 获取豆瓣商城新书速递
+  Future<List<Book>> fetchExpressBooks() async {
+    Response res = await DioInstance.instance()
+        .get(path: ApiString.bookExpressJsonUrl, param: {
+      "tag": BookExpressTag.all.value,
+    });
+    Document doc = parse(res.data['result']);
+    // 这里通过解析 JSON 数据中的 html
+    return _parseExpressBooks(doc);
+  }
 
   /// 获取读书活动
   /// [kind] 读书活动类型
   Future<List<Activity>> fetchBookActivities(int? kind) async {
     // 全部无需参数
     Map<String, dynamic>? param = kind == null ? null : {"kind": kind};
-    Response res = await DioInstance.instance().get(path: ApiString.bookActivitiesJsonUrl, param: param);
+    Response res = await DioInstance.instance()
+        .get(path: ApiString.bookActivitiesJsonUrl, param: param);
     String htmlStr = res.data['result'];
     Document doc = parse(htmlStr);
     return parseBookActivities(doc);
@@ -35,7 +65,8 @@ class SpiderApi {
     Function(List<String> values)? activityLabelsCallback,
     Function(List<Book> values)? booksCallback,
   }) async {
-    String htmlStr = await DioInstance.instance().getString(path: ApiString.bookDoubanHomeUrl);
+    String htmlStr = await DioInstance.instance()
+        .getString(path: ApiString.bookDoubanHomeUrl);
     Document doc = parse(htmlStr);
 
     // 解析活动数据
@@ -45,7 +76,8 @@ class SpiderApi {
 
     // 解析所有活动标签数据
     if (activityLabelsCallback != null) {
-      List<Element> spanEls =  doc.querySelectorAll('.books-activities .hd .tags .item');
+      List<Element> spanEls =
+          doc.querySelectorAll('.books-activities .hd .tags .item');
       List<String> labels = [];
       for (Element span in spanEls) {
         labels.add(span.text.trim());
@@ -55,20 +87,22 @@ class SpiderApi {
 
     // 解析书籍
     if (booksCallback != null) {
-      booksCallback.call(parseHomeBooks(doc));
+      // 这里则是通过解析豆瓣首页的 html
+      booksCallback.call(_parseExpressBooks(doc));
     }
-    
   }
 
   List<Activity> parseBookActivities(Document doc) {
-    List<Element> aEls = doc.querySelectorAll('.books-activities .book-activity');
+    List<Element> aEls =
+        doc.querySelectorAll('.books-activities .book-activity');
     List<Activity> activities = [];
     for (Element a in aEls) {
       String url = a.attributes['href']?.trim() ?? "";
       String cover = ApiString.getBookActivityCover(a.attributes['style']);
       String title = a.querySelector('.book-activity-title')?.text.trim() ?? "";
       String label = a.querySelector('.book-activity-label')?.text.trim() ?? "";
-      String time = a.querySelector('.book-activity-time time')?.text.trim() ?? "";
+      String time =
+          a.querySelector('.book-activity-time time')?.text.trim() ?? "";
       activities.add(Activity(
         url: url,
         cover: cover,
@@ -79,9 +113,9 @@ class SpiderApi {
     }
     return activities;
   }
-  
+
   /// 解析首页书籍数据
-  List<Book> parseHomeBooks(Document doc) {
+  List<Book> _parseExpressBooks(Document doc) {
     List<Book> books = [];
     // 只获取一页
     Element ulEl = doc.querySelectorAll('.books-express .bd .slide-item')[0];
@@ -89,16 +123,86 @@ class SpiderApi {
     for (Element li in liEls) {
       Element? a = li.querySelector('.cover a');
       // 解析ID
-      String id = ApiString.getId(a?.attributes['href'], ApiString.bookIdRegExp);
+      String id =
+          ApiString.getId(a?.attributes['href'], ApiString.bookIdRegExp);
       String cover = a?.querySelector('img')?.attributes['src'] ?? "";
       books.add(Book(
-        id: id,
-        cover: cover,
-        title: li.querySelector('.info .title a')?.text.trim() ?? "",
-        authorName: li.querySelector('.info .author')?.text.trim() ?? ""
-      ));
+          id: id,
+          cover: cover,
+          title: li.querySelector('.info .title a')?.text.trim() ?? "",
+          authorName: li.querySelector('.info .author')?.text.trim() ?? ""));
     }
     return books;
   }
 
+  /// 解析一周热门图书榜
+  List<Book> _parseWeeklyBooks(Document doc) {
+    List<Element> liEls = doc.querySelectorAll(".popular-books .bd ul li");
+    // 使用map方式
+    return liEls.map((li) {
+      // 封面
+      String? cover = li.querySelector(".cover img")?.attributes['src'];
+      // 标题
+      Element? aEl = li.querySelector(".title a");
+      // innerHtml 和 text 都可以
+      String? title = aEl?.innerHtml.trim();
+      // ID
+      String? id =
+          ApiString.getId(aEl?.attributes['href'], ApiString.bookIdRegExp);
+      // 作者
+      String authorName = li.querySelector(".author")?.innerHtml.trim() ?? "";
+      authorName = authorName.replaceFirst("作者：", ""); // 删除 作者：
+      // 副标题
+      String? subTitle;
+      if (title != null && title.isNotEmpty) {
+        List titles = title.split('：');
+        if (titles.length > 1) {
+          title = titles[0];
+          subTitle = titles[1];
+        } else {
+          subTitle = authorName;
+        }
+      }
+      // 评分
+      double rate = parseRate(li.querySelector(".average-rating")?.text.trim());
+      return Book(
+        id: id,
+        title: title,
+        cover: cover,
+        authorName: authorName,
+        subTitle: subTitle,
+        rate: rate,
+      );
+    }).toList();
+  }
+
+  double parseRate(String? rateStr) {
+    if (rateStr == null || rateStr.isEmpty) return 0.0;
+    try {
+      return double.parse(rateStr);
+    } catch (_) {
+      return 0.0;
+    }
+  }
+
+  /// 解析豆瓣图书250
+  List<Book> _parseTop250Books(Document doc) {
+    // class用 . id用#
+    List<Element> dlEls = doc.querySelectorAll("#book_rec dl");
+    // 使用map方式
+    return dlEls.map((dl) {
+      Element aEl = dl.children[0].children[0];
+      // 封面
+      String? cover = aEl.children[0].attributes['src'];
+      // id
+      String? id =
+          ApiString.getId(aEl.attributes['href'], ApiString.bookIdRegExp);
+
+      return Book(
+        id: id,
+        cover: cover,
+        title: dl.children[1].children[0].text.trim(),
+      );
+    }).toList();
+  }
 }

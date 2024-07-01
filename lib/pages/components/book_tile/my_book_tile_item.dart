@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_book_demo/model/book.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyBookTileItem extends StatelessWidget {
@@ -8,8 +10,14 @@ class MyBookTileItem extends StatelessWidget {
   final double? width;
   final double? height;
   final bool? showPrice;
+  final bool? showRate;
   const MyBookTileItem(
-      {super.key, required this.book, this.height, this.width, this.showPrice});
+      {super.key,
+      required this.book,
+      this.height,
+      this.width,
+      this.showPrice,
+      this.showRate});
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +69,48 @@ class MyBookTileItem extends StatelessWidget {
             width: width,
             child: Text(
               maxLines: 1,
-              book.authorName ?? "",
+              book.subTitle ?? book.authorName ?? "",
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
-          )
+          ),
+
+          // 评分
+          _getRateUI(),
+        ],
+      ),
+    );
+  }
+
+  Widget _getRateUI() {
+    if (showRate != true) {
+      return const SizedBox();
+    }
+    return Container(
+      margin: EdgeInsets.only(top: 6.h),
+      width: width,
+      child: Row(
+        children: [
+          RatingBar.builder(
+            itemCount: 5,
+            ignoreGestures: true, // 只显示，不予响应
+            initialRating: (book.rate ?? 0.0) / 2,
+            minRating: 1,
+            direction: Axis.horizontal,
+            allowHalfRating: true, // 半星
+            itemPadding: EdgeInsets.only(right: 2.w),
+            itemSize: 15.r,
+            itemBuilder: (context, _) {
+              return Icon(
+                Icons.star,
+                color: Theme.of(context).colorScheme.tertiary,
+              );
+            },
+            onRatingUpdate: (rating) {},
+          ),
         ],
       ),
     );

@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                 Selector<HomeViewModel, List<Book>?>(
                   builder: (context, books, child) {
                     return MyBookTile(
+                      title: '特别为您准备',
                       books: books,
                       width: 120.w,
                       height: 160.h,

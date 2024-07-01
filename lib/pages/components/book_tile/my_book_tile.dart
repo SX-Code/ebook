@@ -9,12 +9,17 @@ class MyBookTile extends StatelessWidget {
   final double? height;
   final double? width;
   final bool? showPrice;
-  const MyBookTile(
-      {super.key,
-      required this.books,
-      this.height,
-      this.width,
-      this.showPrice = false});
+  final String title;
+  final bool? showRate;
+  const MyBookTile({
+    super.key,
+    required this.books,
+    this.height,
+    this.width,
+    this.showPrice = false,
+    required this.title,
+    this.showRate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,7 @@ class MyBookTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '特别为您准备',
+          title,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
@@ -48,6 +53,7 @@ class MyBookTile extends StatelessWidget {
                 book: books![index],
                 width: width,
                 height: height,
+                showRate: showRate,
                 showPrice: showPrice,
               );
             }),
