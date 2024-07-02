@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/utils/header_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -35,11 +36,10 @@ class MyBookTileItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
                   image: DecorationImage(
-                    image: CachedNetworkImageProvider(book.cover ?? "",
-                        headers: const {
-                          "User-Agent":
-                              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
-                        }),
+                    image: CachedNetworkImageProvider(
+                      book.cover ?? "",
+                      headers: HeaderUtil.randomHeader(),
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),

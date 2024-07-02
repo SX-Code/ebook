@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_book_demo/model/activity.dart';
+import 'package:e_book_demo/utils/header_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
@@ -11,8 +12,7 @@ class MyBookActivities extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 读书活动
-    return 
-        Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -40,10 +40,7 @@ class MyBookActivities extends StatelessWidget {
                       image: DecorationImage(
                           image: CachedNetworkImageProvider(
                             activities[index].cover ?? "",
-                            headers: const {
-                              'User-Agent':
-                                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
-                            },
+                            headers: HeaderUtil.randomHeader(),
                           ),
                           fit: BoxFit.cover),
                     ),

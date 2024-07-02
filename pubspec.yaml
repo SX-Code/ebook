@@ -47,6 +47,8 @@ dependencies:
   html: ^0.15.4
   shimmer: ^3.0.0
   flutter_rating_bar: ^4.0.1
+  blurrycontainer: ^2.1.0
+  readmore: ^3.0.0
 
 dev_dependencies:
   flutter_test:

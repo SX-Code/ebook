@@ -1,5 +1,6 @@
 import 'package:e_book_demo/model/activity.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/pages/book_detail/book_detail_page.dart';
 import 'package:e_book_demo/pages/components/book_tile/my_book_tile.dart';
 import 'package:e_book_demo/pages/components/my_search_tile.dart';
 import 'package:e_book_demo/pages/home/components/my_book_activities.dart';
@@ -114,6 +115,17 @@ class _HomePageState extends State<HomePage> {
                       books: books,
                       width: 120.w,
                       height: 160.h,
+                      itemTap: (book) {
+                        // 跳转到详情页面
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookDetailPage(
+                              book: book,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                   selector: (_, viewModel) => viewModel.books,
