@@ -1,17 +1,18 @@
+import 'package:e_book_demo/http/spider/spider_api.dart';
+import 'package:e_book_demo/model/author.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/model/review.dart';
 import 'package:flutter/material.dart';
 
 class BookDetailViewModel extends ChangeNotifier {
   Book? _book;
-  String? _content;
-  List? _authors;
-  List? _reviews;
+  List<Author>? _authors;
+  List<Review>? _reviews;
   List<Book>? _similiarBooks;
 
   Book? get book => _book;
-  String? get content => _content;
-  List? get authors => _authors;
-  List? get reviews => _reviews;
+  List<Author>? get authors => _authors;
+  List<Review>? get reviews => _reviews;
   List<Book>? get similiarBooks => _similiarBooks;
 
   set book(Book? book) {
@@ -19,17 +20,12 @@ class BookDetailViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  set content(String? content) {
-    _content = content;
-    notifyListeners();
-  }
-
-  set authors(List? authors) {
+  set authors(List<Author>? authors) {
     _authors = authors;
     notifyListeners();
   }
 
-  set reviews(List? reviews) {
+  set reviews(List<Review>? reviews) {
     _reviews = reviews;
     notifyListeners();
   }
@@ -37,5 +33,15 @@ class BookDetailViewModel extends ChangeNotifier {
   set similiarBooks(List<Book>? similiarBooks) {
     _similiarBooks = similiarBooks;
     notifyListeners();
+  }
+
+  Future getBookDetail(Book value) async {
+    SpiderApi.instance().fetchBookDetail(
+      value,
+      bookCallback: (Book value) => book = value,
+      authorCallback: (List<Author> values) => authors = values,
+      reviewCallback: (List<Review> values) => reviews = values,
+      similiarBooksCallback: (List<Book> values) => similiarBooks = values,
+    );
   }
 }

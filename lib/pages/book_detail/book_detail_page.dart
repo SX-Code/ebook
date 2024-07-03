@@ -20,6 +20,13 @@ class BookDetailPage extends StatefulWidget {
 
 class _BookDetailPageState extends State<BookDetailPage> {
   final BookDetailViewModel _viewModel = BookDetailViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.getBookDetail(widget.book);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -77,8 +84,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
           // 定价、页数、评分
           Selector<BookDetailViewModel, Book?>(
             builder: (context, book, child) {
-              return const MyBookDetailTile(
-                labels: ["定价", "页数", "评分"],
+              List<String>? data;
+              if (book?.page != null) {
+                data = ['¥${book?.price}', '${book?.page}', '${book?.rate}'];
+              }
+              return MyBookDetailTile(
+                labels: const ["定价", "页数", "评分"],
+                data: data,
               );
             },
             selector: (_, viewModel) => viewModel.book,
@@ -86,14 +98,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
           30.verticalSpace,
 
           // 内容简介
-          Selector<BookDetailViewModel, String?>(
-            builder: (context, content, child) {
+          Selector<BookDetailViewModel, Book?>(
+            builder: (context, book, child) {
               return MyBookContentTile(
-                content: content,
+                book: book,
                 labelTitle: '当前版本有售',
               );
             },
-            selector: (_, viewModel) => viewModel.content,
+            selector: (_, viewModel) => viewModel.book,
           ),
 
           30.verticalSpace,

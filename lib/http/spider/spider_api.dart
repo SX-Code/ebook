@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:e_book_demo/http/dio_instance.dart';
 import 'package:e_book_demo/http/spider/api_string.dart';
 import 'package:e_book_demo/model/activity.dart';
+import 'package:e_book_demo/model/author.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/model/review.dart';
 import 'package:e_book_demo/model/types.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -16,6 +18,36 @@ class SpiderApi {
 
   static SpiderApi instance() {
     return _instance ??= SpiderApi._();
+  }
+
+  /// 获取图书详情数据
+  /// [value] 图书信息
+  Future fetchBookDetail(
+    Book value, {
+    Function(Book value)? bookCallback,
+    Function(List<Author> values)? authorCallback,
+    Function(List<Review> values)? reviewCallback,
+    required Function(List<Book> values) similiarBooksCallback,
+  }) async {
+    String html = await DioInstance.instance()
+        .getString(path: '${ApiString.bookDetailUrl}${value.id}');
+    Document doc = parse(html);
+
+    if (bookCallback != null) {
+      bookCallback.call(_parseBookDetail(value, doc));
+    }
+
+    if (authorCallback != null) {
+      authorCallback.call(_parseBookAuthors(doc));
+    }
+
+    if (reviewCallback != null) {
+      reviewCallback.call(_parseBookReview(doc));
+    }
+
+    if (reviewCallback != null) {
+      similiarBooksCallback.call(_parseSimiliarBook(doc));
+    }
   }
 
   /// 解析豆瓣商城首页数据
@@ -204,5 +236,59 @@ class SpiderApi {
         title: dl.children[1].children[0].text.trim(),
       );
     }).toList();
+  }
+
+  /// 解析图书详情
+  Book _parseBookDetail(Book value, Document doc) {
+    Element? bookEl = doc.querySelector(".subjectwrap");
+    if (bookEl == null) return value;
+    // 图书定价、页码、评分
+    String? text = bookEl.querySelector('#info')?.text.trim();
+    // 页码
+    value.page = ApiString.getBookPage(text);
+    // 定价
+    value.price = ApiString.getBookPrice(text);
+    // 评分
+    value.rate =
+        parseRate(bookEl.querySelector(".rating_num")?.text.trim() ?? "");
+
+    // 内容简介
+    String desc =
+        doc.querySelector(".related_info .all .intro")?.text.trim() ?? "";
+    if (desc.isEmpty) {
+      // 没有展开按钮
+      desc = doc.querySelector(".related_info .intro")?.text.trim() ?? "";
+    }
+    value.description = desc;
+
+    // 购买信息
+    List<Element> buyInfoEls = doc.querySelectorAll(".buyinfo ul li");
+    value.buyInfo = buyInfoEls.map((el) {
+      // 价格
+      String priceStr =
+          el.querySelector(".price-wrapper .buylink-price")?.text.trim() ?? "";
+      priceStr = priceStr.replaceFirst("元", "");
+
+      return BuyInfo(
+          name: el.querySelector(".vendor-name span")?.text,
+          price: parseRate(priceStr),
+          url: el.querySelector(".vendor-name a")?.attributes['href']);
+    }).toList();
+    return value;
+  }
+
+  // 解析图书作者数据
+  List<Author> _parseBookAuthors(Document doc) {
+    return [];
+  }
+
+  // 解析图书短评
+  List<Review> _parseBookReview(Document doc) {
+    return [];
+  }
+
+  // 解析相似书籍
+  List<Book> _parseSimiliarBook(Document doc) {
+    return [];
   }
 }

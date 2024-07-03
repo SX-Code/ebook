@@ -2,6 +2,7 @@ import 'package:e_book_demo/http/dio_instance.dart';
 import 'package:e_book_demo/pages/root/root_page.dart';
 import 'package:e_book_demo/pages/theme/dart_theme.dart';
 import 'package:e_book_demo/pages/theme/theme_provider.dart';
+import 'package:e_book_demo/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> {
       designSize: designSize,
       builder: (context, child) {
         return MaterialApp(
+          navigatorKey: ToastUtils.navigatorKey,
           debugShowCheckedModeBanner: false,
           theme: Provider.of<ThemeProvider>(context, listen: true).themeData,
           darkTheme: darkMode,
