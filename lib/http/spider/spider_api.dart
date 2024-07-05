@@ -279,16 +279,88 @@ class SpiderApi {
 
   // 解析图书作者数据
   List<Author> _parseBookAuthors(Document doc) {
-    return [];
+    List<Element> liEls = doc.querySelectorAll(".authors-list .author");
+    List<Author> authors = [];
+    // 忽略最后一个li.fake
+    for (int i = 0; i < liEls.length - 1; i++) {
+      Element li = liEls[i];
+      // 作者ID
+      String authorId = ApiString.getId(
+          li.children[0].attributes['href'], ApiString.authorIdRegExp);
+      Element infoEl = li.children[1];
+
+      authors.add(Author(
+        id: authorId,
+        avatar: li.children[0].children[0].attributes['src'],
+        name: infoEl.children[0].text, // 作者姓名
+        role: infoEl.children[1].text, // 角色
+      ));
+    }
+    return authors;
   }
 
   // 解析图书短评
   List<Review> _parseBookReview(Document doc) {
-    return [];
+    List<Element> itemEls = doc.querySelectorAll(".review-list .review-item");
+    List<Review> reviews = [];
+    // 只取5条
+    int count = 0;
+    for (int i = 0; i < itemEls.length; i++) {
+      if (count > 4) {
+        break;
+      }
+      count++;
+
+      Element item = itemEls[i];
+      Element hdEl = item.children[0];
+      Element bdEl = item.children[1];
+
+      // 作者
+      Author author = Author(
+        name: hdEl.querySelector(".name")?.text,
+        avatar: hdEl.querySelector(".avator img")?.attributes['src'],
+      );
+      // 评分
+      double? rate = Review.getRate(
+          hdEl.querySelector(".main-title-rating")?.attributes['title']);
+      // 短评
+      String short = bdEl.querySelector(".short-content")?.text ?? "";
+      short = short.replaceFirst("(展开)", "").trim();
+      reviews.add(Review(
+        author: author,
+        rate: rate,
+        short: short,
+      ));
+    }
+    return reviews;
   }
 
   // 解析相似书籍
   List<Book> _parseSimiliarBook(Document doc) {
-    return [];
+    List<Element> dlEls = doc.querySelectorAll("#db-rec-section .content dl");
+    List<Book> books = [];
+    for (Element dl in dlEls) {
+      // 排除.clear，无效数据
+      if (dl.className == 'clear') {
+        continue;
+      }
+      // 封面
+      String? cover = dl.querySelector("img.m_sub_img")?.attributes['src'];
+      // 名称
+      Element? aEl = dl.querySelector("dd a");
+      String? title = aEl?.text.trim();
+      // id
+      String id =
+          ApiString.getId(aEl?.attributes['href'], ApiString.bookIdRegExp);
+      // 评分
+      double rate = parseRate(dl.querySelector(".subject-rate")?.text);
+      books.add(Book(
+        id: id,
+        title: title,
+        cover: cover,
+        rate: rate,
+      ));
+    }
+    return books;
   }
 }

@@ -29,23 +29,23 @@ class MyAuthorTile extends StatelessWidget {
                         height: 40.r,
                         width: 40.r,
                         fit: BoxFit.cover,
-                        imageUrl:
-                            'https://img1.doubanio.com/view/personage/m/public/5502f513f32ae0f2c7e6422ba09c4478.jpg',
+                        imageUrl: authors?[index].avatar ?? "",
                         httpHeaders: HeaderUtil.randomHeader(),
                       ),
                     ),
                     10.horizontalSpace,
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "罗新",
+                          authors?[index].name ?? "",
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
-                          "作者",
+                          authors?[index].role ?? "",
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: Theme.of(context).colorScheme.inversePrimary,
@@ -55,7 +55,7 @@ class MyAuthorTile extends StatelessWidget {
                     )
                   ],
                 ),
-            
+
                 // 了解作者
                 Row(
                   children: [

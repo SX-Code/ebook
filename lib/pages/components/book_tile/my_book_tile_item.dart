@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_book_demo/model/book.dart';
 import 'package:e_book_demo/utils/header_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -62,25 +61,31 @@ class MyBookTileItem extends StatelessWidget {
               ),
             ),
           ),
-
           // 副标题
-          Container(
-            padding: EdgeInsets.only(top: 5.h),
-            width: width,
-            child: Text(
-              maxLines: 1,
-              book.subTitle ?? book.authorName ?? "",
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-            ),
-          ),
+          _getSubTitleUI(context),
 
           // 评分
           _getRateUI(),
         ],
+      ),
+    );
+  }
+
+  Widget _getSubTitleUI(BuildContext context) {
+    if (book.subTitle == null && book.authorName == null) {
+      return const SizedBox();
+    }
+    return Container(
+      padding: EdgeInsets.only(top: 5.h),
+      width: width,
+      child: Text(
+        maxLines: 1,
+        book.subTitle ?? book.authorName ?? "",
+        style: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.inversePrimary,
+        ),
       ),
     );
   }

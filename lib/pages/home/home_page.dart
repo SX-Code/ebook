@@ -1,6 +1,5 @@
 import 'package:e_book_demo/model/activity.dart';
 import 'package:e_book_demo/model/book.dart';
-import 'package:e_book_demo/pages/book_detail/book_detail_page.dart';
 import 'package:e_book_demo/pages/components/book_tile/my_book_tile.dart';
 import 'package:e_book_demo/pages/components/my_search_tile.dart';
 import 'package:e_book_demo/pages/home/components/my_book_activities.dart';
@@ -8,6 +7,7 @@ import 'package:e_book_demo/pages/home/components/my_book_activities_skeleton.da
 import 'package:e_book_demo/pages/home/components/my_book_activity_labels.dart';
 import 'package:e_book_demo/pages/home/components/my_book_activity_labels_skeleton.dart';
 import 'package:e_book_demo/pages/home/home_vm.dart';
+import 'package:e_book_demo/utils/navigator_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -117,14 +117,7 @@ class _HomePageState extends State<HomePage> {
                       height: 160.h,
                       itemTap: (book) {
                         // 跳转到详情页面
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookDetailPage(
-                              book: book,
-                            ),
-                          ),
-                        );
+                        NavigatorUtils.nav2BookDetailPage(context, book: book);
                       },
                     );
                   },

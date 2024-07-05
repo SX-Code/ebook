@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:e_book_demo/model/review.dart';
 import 'package:e_book_demo/utils/header_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyBookReviewTileItem extends StatelessWidget {
-  final String review;
+  final Review review;
   const MyBookReviewTileItem({super.key, required this.review});
 
   @override
@@ -27,7 +28,7 @@ class MyBookReviewTileItem extends StatelessWidget {
                   width: 40.r,
                   fit: BoxFit.cover,
                   imageUrl:
-                      'https://img1.doubanio.com/view/personage/m/public/5502f513f32ae0f2c7e6422ba09c4478.jpg',
+                      review.author?.avatar ?? "",
                   httpHeaders: HeaderUtil.randomHeader(),
                 ),
               ),
@@ -40,7 +41,7 @@ class MyBookReviewTileItem extends StatelessWidget {
                 children: [
                   // 名称
                   Text(
-                    '螺丝',
+                    review.author?.name ?? "",
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
@@ -50,7 +51,7 @@ class MyBookReviewTileItem extends StatelessWidget {
                   RatingBar.builder(
                     itemCount: 5,
                     ignoreGestures: true, // 只显示，不予响应
-                    initialRating: (9.8) / 2,
+                    initialRating: (review.rate ?? 0.0) / 2,
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: true, // 半星
@@ -71,7 +72,7 @@ class MyBookReviewTileItem extends StatelessWidget {
           10.verticalSpace,
           // 作者评论
           Text(
-            review,
+            review.short ?? "",
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,

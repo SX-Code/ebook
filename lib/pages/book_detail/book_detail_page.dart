@@ -1,4 +1,5 @@
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/model/review.dart';
 import 'package:e_book_demo/pages/book_detail/book_detail_vm.dart';
 import 'package:e_book_demo/pages/components/author_tile/my_author_tile.dart';
 import 'package:e_book_demo/pages/components/book_content_tile/my_book_content_tile.dart';
@@ -6,6 +7,7 @@ import 'package:e_book_demo/pages/components/book_detail_tile/my_book_detail_til
 import 'package:e_book_demo/pages/components/book_review_tile/my_book_review_tile.dart';
 import 'package:e_book_demo/pages/components/book_tile/my_book_tile.dart';
 import 'package:e_book_demo/pages/components/my_book_detail_appbar.dart';
+import 'package:e_book_demo/utils/navigator_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +125,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           30.verticalSpace,
 
           // 书评
-          Selector<BookDetailViewModel, List?>(
+          Selector<BookDetailViewModel, List<Review>?>(
             builder: (context, reviews, child) {
               return MyBookReview(
                 reviews: reviews,
@@ -141,16 +143,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 books: books,
                 width: 120.w,
                 height: 160.h,
+                showRate: true,
                 itemTap: (book) {
                   // 跳转到详情页面
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookDetailPage(
-                        book: book,
-                      ),
-                    ),
-                  );
+                  NavigatorUtils.nav2BookDetailPage(context, book: book);
                 },
               );
             },

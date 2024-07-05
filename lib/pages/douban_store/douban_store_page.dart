@@ -2,6 +2,7 @@ import 'package:e_book_demo/model/book.dart';
 import 'package:e_book_demo/pages/components/book_tile/my_book_tile.dart';
 import 'package:e_book_demo/pages/components/my_search_tile.dart';
 import 'package:e_book_demo/pages/douban_store/douban_store_vm.dart';
+import 'package:e_book_demo/utils/navigator_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,7 @@ class _DoubanStorePageState extends State<DoubanStorePage> {
                   title: '新书速递',
                   width: 120.w,
                   height: 160.h,
+                  itemTap: (book) => NavigatorUtils.nav2BookDetailPage(context, book: book),
                 );
               },
               selector: (_, viewModel) => viewModel.expressBooks,
@@ -79,6 +81,7 @@ class _DoubanStorePageState extends State<DoubanStorePage> {
                   width: 120.w,
                   height: 160.h,
                   showRate: true,
+                  itemTap: (book) => NavigatorUtils.nav2BookDetailPage(context, book: book),
                 );
               },
               selector: (_, viewModel) => viewModel.weeklyBooks,
@@ -94,6 +97,7 @@ class _DoubanStorePageState extends State<DoubanStorePage> {
                   title: '豆瓣阅读Top250',
                   width: 120.w,
                   height: 160.h,
+                  itemTap: (book) => NavigatorUtils.nav2BookDetailPage(context, book: book),
                 );
               },
               selector: (_, viewModel) => viewModel.top250Books,

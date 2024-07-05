@@ -9,6 +9,7 @@ class ApiString {
   static const String bookIdRegExp = r'(?<=/subject/)\d+(?=/)'; // 获取书籍ID
   static const String bookPageRegExp = r'(?<=页数:)\s{1,}\d{2,}'; // 书籍页码
   static const String bookPriceRegExp = r'(?<=定价:).*';
+  static String authorIdRegExp = r'(?<=/author/)\d+(?=/)'; 
 
   static String getBookActivityCover(String? style) {
     if (style == null || style.isEmpty) return "";

@@ -1,10 +1,11 @@
+import 'package:e_book_demo/model/review.dart';
 import 'package:e_book_demo/pages/components/book_review_tile/my_book_review_tile_item.dart';
 import 'package:e_book_demo/pages/components/book_review_tile/my_book_review_tile_item_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyBookReview extends StatelessWidget {
-  final List? reviews;
+  final List<Review>? reviews;
   const MyBookReview({super.key, this.reviews});
 
   @override
