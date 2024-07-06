@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:e_book_demo/http/dio_instance.dart';
 import 'package:e_book_demo/http/spider/api_string.dart';
 import 'package:e_book_demo/model/activity.dart';
 import 'package:e_book_demo/model/author.dart';
 import 'package:e_book_demo/model/book.dart';
+import 'package:e_book_demo/model/ebook_category.dart';
 import 'package:e_book_demo/model/review.dart';
 import 'package:e_book_demo/model/types.dart';
 import 'package:html/dom.dart';
@@ -19,6 +19,114 @@ class SpiderApi {
   static SpiderApi instance() {
     return _instance ??= SpiderApi._();
   }
+
+  /**
+   * 
+   * 
+   * 豆 瓣 阅 读
+   * 
+   */
+
+  ///
+  Future fetchEBookStoreData({
+    Function(List<Book> values)? recommendCallback,
+    Function(List<EBookCategory>)? categoriesCallback,
+  }) async {
+    String html =
+        await DioInstance.instance().getString(path: ApiString.ebookUrl);
+    Document doc = parse(html);
+
+    // 解析编辑推荐
+    recommendCallback?.call(_parseRecommendEBooks(doc));
+
+    // 解析分类
+    categoriesCallback?.call(_parseEBookCategories(doc));
+  }
+
+  /// 解析编辑推荐电子书
+  List<Book> _parseRecommendEBooks(Document doc) {
+    return _parseEBookByClass(doc, EBookType.recommend);
+  }
+
+  /// 解析电子书分类
+  List<EBookCategory> _parseEBookCategories(Document doc) {
+    return doc.querySelectorAll(".kinds .kinds-list a").map((a) {
+      return EBookCategory(
+        id: ApiString.getId(a.attributes['href'], ApiString.ebookCategoryIdRegExp),
+        name: a.text,
+        url: a.attributes['href']
+      );
+    }).toList();
+  }
+
+  // 根据 className 获取节点
+  List<Book> _parseEBookByClass(Document doc, EBookType type) {
+    // 获取所有ul
+    List<Element>? ulEls =
+        doc.querySelector("${type.clz} .slide-list")?.children;
+    List<Book> eBooks = [];
+    if (ulEls == null) return eBooks;
+
+    // 我们只拿10条数据，一个ul里面有5个，拿两个ul
+    for (int i = 0; i < ulEls.length; i++) {
+      if (i > 1) {
+        break;
+      }
+      Element ul = ulEls[i];
+
+      eBooks.addAll(ul.children.map((li) {
+        return _parseEBook(li, true);
+      }).toList());
+    }
+
+    return eBooks;
+  }
+
+  /// 解析具体的电子书
+  /// [isRecommend] 编辑推荐，从data-src中获取图片
+  Book _parseEBook(Element element, bool isRecommend) {
+    // id
+    String? eBookId = ApiString.getId(
+        element.querySelector(".pic")?.attributes['href'],
+        ApiString.ebookIdRegExp);
+
+    // 封面
+    String? cover = element
+        .querySelector(".pic img")
+        ?.attributes[isRecommend ? "data-src" : "src"];
+
+    // 价格
+    String priceStr = element.querySelector(".discount-price")?.text ?? "";
+    if (priceStr.isEmpty) {
+      // 没有优惠价，尝试获取立减价格
+      priceStr = element.querySelector(".price-num")?.text ?? "";
+      if (priceStr.isEmpty) {
+        // 没有立减价格，获取日常价格
+        priceStr = element.querySelector(".price-tag")?.text ?? "";
+      } else{
+        double originPrice = ApiString.getEBookDiscountOrder(element.querySelector(".discount")?.text);
+        // 价格运算使用 dart 的 double 类型不合理，如果你做正真的项目，不要这样用
+        priceStr = (originPrice - double.parse(priceStr)).toStringAsFixed(2);
+      }
+    }
+
+    priceStr = priceStr.replaceFirst("元", '').trim();
+
+    return Book(
+      id: eBookId,
+      cover: cover,
+      title: element.querySelector(".title a")?.text, // 标题
+      authorName: element.querySelector(".author a")?.text, // 副标题/作者
+      price: parseRate(priceStr),
+    );
+  }
+
+  /**
+   * 
+   * 
+   * 豆 瓣 读 书
+   * 
+   */
 
   /// 获取图书详情数据
   /// [value] 图书信息

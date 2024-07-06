@@ -47,8 +47,8 @@ class MyBookTile extends StatelessWidget {
               if (books == null) {
                 // 骨架屏
                 return MyBookTileItemSkeleton(
-                  width: width,
-                  height: height,
+                  width: width ?? 120.w,
+                  height: height ?? 160.h,
                 );
               }
               return GestureDetector(
@@ -58,8 +58,8 @@ class MyBookTile extends StatelessWidget {
                 },
                 child: MyBookTileItem(
                   book: books![index],
-                  width: width,
-                  height: height,
+                  width: width ?? 120.w,
+                  height: height ?? 160.h,
                   showRate: showRate,
                   showPrice: showPrice,
                 ),
